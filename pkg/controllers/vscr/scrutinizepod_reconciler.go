@@ -187,6 +187,7 @@ func (s *ScrutinizePodReconciler) buildScrutinizeCmdArgs(vdb *v1.VerticaDB, vscr
 		// container and have scrutinize read the password from the mounted file
 		cmd = append(cmd, "--password-file", paths.ScrutinizeDBPasswordFile)
 	}
+
 	return cmd
 }
 
