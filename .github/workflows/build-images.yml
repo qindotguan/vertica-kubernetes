@@ -105,8 +105,11 @@ jobs:
       if: ${{ inputs.full_vertica_image == '' }}
 
     - name: Download the RPM
-      uses: ./.github/actions/download-rpm
+      uses: ./.github/workflows/download-rpm.yml
       if: ${{ inputs.legacy_vertica_image == '' }}
+      with:
+        amd_rpm: vertica-25.1.0-0.RHEL8.x86_64.rpm
+        arm_rpm: vertica-25.1.0-0.RHEL8.aarch64.rpm
 
     - name: Build the full server image
       if: ${{ inputs.full_vertica_image == '' }}
@@ -301,8 +304,11 @@ jobs:
       if: ${{ inputs.minimal_vertica_image == '' }}
         
     - name: Download the RPM
-      uses: ./.github/actions/download-rpm
+      uses: ./.github/workflows/download-rpm.yml
       if: ${{ inputs.legacy_vertica_image == '' }}
+      with:
+        amd_rpm: vertica-25.1.0-0.RHEL8.x86_64.rpm
+        arm_rpm: vertica-25.1.0-0.RHEL8.aarch64.rpm
 
     - name: Build the minimal server image
       if: ${{ inputs.minimal_vertica_image == '' }}
