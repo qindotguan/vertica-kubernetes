@@ -39,6 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+    - uses: actions/checkout@v4
+
     # Will download the RPM as prep for container building
     - name: Download Vertica RPM
       run: |
