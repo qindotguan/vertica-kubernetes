@@ -34,18 +34,17 @@ jobs:
       run: |
         s3Key=${{ secrets.AWS_ACCESS_KEY_ID }}
         s3Secret=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        date="$(date -u '+%a, %e %b %Y %H:%M:%S +0000')"
+        date=$(date -u '+%a, %e %b %Y %H:%M:%S +0000')
 
         for RPM_URL in ${{ env.VERTICA_CE_URL }} ${{ env.VERTICA_CE_URL_ARM64 }}
         do
-            bucket=$(echo $RPM_URL | awk -F[/.] '{print $3}')
-            arch=$(echo $RPM_URL | awk -F'.' '{print $(NF-1)}')
-            file=$(echo $RPM_URL | awk -F'/' '{print $4"/"$5}')
-            resource="/${bucket}/${file}"
-            printf -v stringToSign "%s\n%s\n\n%s\n%b%s" "GET" "" "$date" "" "${resource}"
-            signature="$(echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | openssl base64)"
-            curl -s -f -H "Date: ${date}" -H "Authorization: AWS ${s3Key}:${signature}" $RPM_URL -o docker-vertica/packages/vertica-latest.RHEL8.${arch}.rpm
+          bucket=$(echo $RPM_URL | awk -F[/.] '{print $3}')
+          arch=$(echo $RPM_URL | awk -F'.' '{print $(NF-1)}')
+          file=$(echo $RPM_URL | awk -F'/' '{print $4"/"$5}')
+          resource=/$bucket/$file
+          printf -v stringToSign "%s\n%s\n\n%s\n%b%s" "GET" "" "$date" "" "$resource"
+          signature=$(echo -n "$stringToSign" | openssl sha1 -hmac $s3Secret -binary | openssl base64)
+          curl -s -f -H "Date: $date" -H "Authorization: AWS $s3Key:$signature" $RPM_URL -o docker-vertica/packages/vertica-latest.RHEL8.$arch.rpm
         done
 
         cp docker-vertica/packages/*rpm docker-vertica-v2/packages
-      shell: bash
