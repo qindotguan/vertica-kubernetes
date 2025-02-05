@@ -36,7 +36,7 @@ jobs:
         s3Secret=${{ secrets.AWS_SECRET_ACCESS_KEY }}
         date="$(date -u '+%a, %e %b %Y %H:%M:%S +0000')"
 
-        for RPM_URL in ${{ env.VERTICA_CE_URL }} ${{ env.VERTICA_CE_URL_ARM64 }}; do
+        for RPM_URL in ${{ env.VERTICA_CE_URL }} ${{ env.VERTICA_CE_URL_ARM64 }} ; do
             bucket=$(echo $RPM_URL | awk -F[/.] '{print $3}')      # vertica-community-edition-for-testing
             arch=$(echo $RPM_URL | awk -F'.' '{print $(NF-1)}')    # x86_64 or aarch64
             file=$(echo $RPM_URL | awk -F'/' '{print $4"/"$5}')    # XCz9cp7m/vertica-25.1.0-0.RHEL8.${arch}.rpm
