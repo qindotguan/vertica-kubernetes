@@ -37,12 +37,12 @@ jobs:
         date=$(date -u '+%a, %e %b %Y %H:%M:%S +0000')
 
         resource=/vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm
-        printf -v stringToSign "%s\n%s\n\n%s\n%s" "GET" "" "$date" "$resource"
+        stringToSign=$(printf "%s\n%s\n\n%s\n%s" "GET" "" "$date" "$resource")
         signature=$(echo -n "$stringToSign" | openssl sha1 -hmac $s3Secret -binary | openssl base64)
         curl -s -f -H "Date: $date" -H "Authorization: AWS $s3Key:$signature" ${{ env.VERTICA_CE_URL }} -o docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
 
         resource=/vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm
-        printf -v stringToSign "%s\n%s\n\n%s\n%s" "GET" "" "$date" "$resource"
+        stringToSign=$(printf "%s\n%s\n\n%s\n%s" "GET" "" "$date" "$resource")
         signature=$(echo -n "$stringToSign" | openssl sha1 -hmac $s3Secret -binary | openssl base64)
         curl -s -f -H "Date: $date" -H "Authorization: AWS $s3Key:$signature" ${{ env.VERTICA_CE_URL_ARM64 }} -o docker-vertica/packages/vertica-latest.RHEL8.aarch64.rpm
 
