@@ -45,7 +45,7 @@ jobs:
         curl -H "Host: ${bucket}.s3.amazonaws.com" \
         -H "Date: ${date}" \
         -H "Authorization: AWS ${s3Key}:${signature}" \
-        ${{ env.VERTICA_CE_URL }} -o ${GITHUB_WORKSPACE}/docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
+        ${{ env.VERTICA_CE_URL }} -o /tmp/vertica-latest.RHEL8.x86_64.rpm
 
         file=XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm
         resource="/${bucket}/${file}"
@@ -54,6 +54,7 @@ jobs:
         curl -H "Host: ${bucket}.s3.amazonaws.com" \
         -H "Date: ${date}" \
         -H "Authorization: AWS ${s3Key}:${signature}" \
-        ${{ env.VERTICA_CE_URL_ARM64}} -o ${GITHUB_WORKSPACE}/docker-vertica/packages/vertica-latest.RHEL8.aarch64.rpm
+        ${{ env.VERTICA_CE_URL_ARM64}} -o /tmp/vertica-latest.RHEL8.aarch64.rpm
 
-        cp docker-vertica/packages/*rpm docker-vertica-v2/packages
+        cp /tmp/*rpm docker-vertica/packages
+        cp /tmp/*rpm docker-vertica-v2/packages
