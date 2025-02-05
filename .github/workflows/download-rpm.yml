@@ -39,7 +39,7 @@ jobs:
       uses: keithweaver/aws-s3-github-action@v1.0.0
       with:
         command: sync
-        source: vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm
+        source: s3://vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm
         destination: docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
