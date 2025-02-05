@@ -25,6 +25,9 @@ ARG MINIMAL
 ARG DBADMIN_GID=5000
 ARG DBADMIN_UID=5000
 
+RUN cat ./packages/${VERTICA_X86_RPM}
+RUN cat ./packages/${VERTICA_ARM64_RPM}
+
 COPY ./packages/${VERTICA_X86_RPM} /tmp/
 COPY ./packages/${VERTICA_ARM64_RPM} /tmp/
 # this is a script which removes unnecessary stuff from the
@@ -57,9 +60,11 @@ RUN set -x \
   && /usr/sbin/useradd -r -m -s /bin/bash -g verticadba --uid ${DBADMIN_UID} dbadmin \
   && ls /tmp/ \
   && if [[ "$TARGETARCH" == "arm64" ]] ; then \
+      head /tmp/${VERTICA_ARM64_RPM} \
       uname -m && \
       yum localinstall -y /tmp/${VERTICA_ARM64_RPM} ; \
     elif [[ "$TARGETARCH" == "amd64" ]] ; then \
+      head /tmp/${VERTICA_ARM64_RPM} \
       yum localinstall -y /tmp/${VERTICA_X86_RPM} ; \
     else \
       exit 1; \
