@@ -38,7 +38,7 @@ jobs:
     - name: Download Vertica RPM
       uses: keithweaver/aws-s3-github-action@v1.0.0
       with:
-        command: sync
+        command: cp
         source: s3://vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm
         destination: docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -50,5 +50,5 @@ jobs:
         #cp docker-vertica/packages/*rpm docker-vertica-v2/packages
     - name: dir after
       run: |
-        ls -l docker-vertica/packages/*rpm
-        ls -l docker-vertica-v2/packages/*rpm
+        ls -l docker-vertica/packages/
+        ls -l docker-vertica-v2/packages/
