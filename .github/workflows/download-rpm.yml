@@ -34,24 +34,29 @@ jobs:
       run: |
         s3Key=${{ secrets.AWS_ACCESS_KEY_ID }}
         s3Secret=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        date=$(date -u '+%a, %e %b %Y %H:%M:%S +0000')
 
-        resource=/vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm
-        stringToSign="GET
-        
-        
-        $date
-        $resource"
-        signature=$(echo -n "$stringToSign" | openssl sha1 -hmac $s3Secret -binary | openssl base64)
-        curl -s -f -H "Date: $date" -H "Authorization: AWS $s3Key:$signature" ${{ env.VERTICA_CE_URL }} -o docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
+        dateValue="`date +'%a, %d %b %Y %H:%M:%S %z'`"
+        contentType="application/x-rpm"
+        bucket=vertica-community-edition-for-testing
 
-        resource=/vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm
-        stringToSign="GET
-        
-        
-        $date
-        $resource"
-        signature=$(echo -n "$stringToSign" | openssl sha1 -hmac $s3Secret -binary | openssl base64)
-        curl -s -f -H "Date: $date" -H "Authorization: AWS $s3Key:$signature" ${{ env.VERTICA_CE_URL_ARM64 }} -o docker-vertica/packages/vertica-latest.RHEL8.aarch64.rpm
+        file=XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm
+        resource="/${bucket}/${file}"
+        stringToSign="printf GET ${contentType} ${dateValue} ${resource}"
+        signature=`/bin/echo -en "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64`
+        curl -H "Host: ${bucket}.s3.amazonaws.com" \
+        -H "Date: ${dateValue}" \
+        -H "Content-Type: ${contentType}" \
+        -H "Authorization: AWS ${s3Key}:${signature}" \
+        ${{ env.VERTICA_CE_URL }} -o docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
+
+        file=XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm
+        resource="/${bucket}/${file}"
+        stringToSign="GET ${contentType} ${dateValue} ${resource}"
+        signature=`/bin/echo -en "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | base64`
+        curl -H "Host: ${bucket}.s3.amazonaws.com" \
+        -H "Date: ${dateValue}" \
+        -H "Content-Type: ${contentType}" \
+        -H "Authorization: AWS ${s3Key}:${signature}" \
+        ${{ env.VERTICA_CE_URL_ARM64}} -o docker-vertica/packages/vertica-latest.RHEL8.aarch64.rpm
 
         cp docker-vertica/packages/*rpm docker-vertica-v2/packages
