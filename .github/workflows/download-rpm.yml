@@ -25,7 +25,7 @@ env:
     VERTICA_CE_URL_ARM64: "https://vertica-community-edition-for-testing.s3.amazonaws.com/XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm"
     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    AWS_DEFAULT_REGION: 'us-east-1'
+    AWS_REGION: 'us-east-1'
 
 jobs:
   download-rpm:
@@ -36,8 +36,19 @@ jobs:
 
     # Will download the RPM as prep for container building
     - name: Download Vertica RPM
-      run: |
-        aws s3 cp s3://vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
-        aws s3 cp s3://vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm docker-vertica/packages/vertica-latest.RHEL8.aarch64.rpm
+      uses: keithweaver/aws-s3-github-action@v1.0.0
+      with:
+        command: sync
+        source: vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm
+        destination: docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_region: ${{ secrets.AWS_REGION }}
+        #aws s3 cp s3://vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
+        #aws s3 cp s3://vertica-community-edition-for-testing/XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm docker-vertica/packages/vertica-latest.RHEL8.aarch64.rpm
 
-        cp docker-vertica/packages/*rpm docker-vertica-v2/packages
+        #cp docker-vertica/packages/*rpm docker-vertica-v2/packages
+    - name: dir after
+      run: |
+        ls -l docker-vertica/packages/*rpm
+        ls -l docker-vertica-v2/packages/*rpm
