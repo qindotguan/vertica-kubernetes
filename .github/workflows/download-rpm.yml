@@ -36,16 +36,26 @@ jobs:
       run: |
         s3Key=${{ secrets.AWS_ACCESS_KEY_ID }}
         s3Secret=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        date="$(date -u '+%a, %e %b %Y %H:%M:%S +0000')"
 
-        for RPM_URL in ${VERTICA_CE_URL} ${VERTICA_CE_URL_ARM64}; do
-            bucket=$(echo $RPM_URL | awk -F[/.] '{print $3}')      # vertica-community-edition-for-testing
-            arch=$(echo $RPM_URL | awk -F'.' '{print $(NF-1)}')    # x86_64 or aarch64
-            file=$(echo $RPM_URL | awk -F'/' '{print $4"/"$5}')    # XCz9cp7m/vertica-25.1.0-0.RHEL8.${arch}.rpm
-            resource="/${bucket}/${file}"
-            printf -v stringToSign "%s\n%s\n\n%s\n%s" "GET" "" "$date" "${resource}"
-            signature=$(echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | openssl base64)
-            curl -s -f -H "Date: ${date}" -H "Authorization: AWS ${s3Key}:${signature}" $RPM_URL -o docker-vertica/packages/vertica-latest.RHEL8.${arch}.rpm
-        done
+        date="$(date -u '+%a, %e %b %Y %H:%M:%S +0000')"
+        bucket=vertica-community-edition-for-testing
+
+        file=XCz9cp7m/vertica-25.1.0-0.RHEL8.x86_64.rpm
+        resource="/${bucket}/${file}"
+        printf -v stringToSign "%s\n%s\n\n%s\n%s" "GET" "" "$date" "${resource}"
+        signature=$(echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | openssl base64)
+        curl -H "Host: ${bucket}.s3.amazonaws.com" \
+        -H "Date: ${date}" \
+        -H "Authorization: AWS ${s3Key}:${signature}" \
+        ${{ env.VERTICA_CE_URL }} -o docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
+
+        file=XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm
+        resource="/${bucket}/${file}"
+        printf -v stringToSign "%s\n%s\n\n%s\n%s" "GET" "" "$date" "${resource}"
+        signature=`/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | openssl base64`
+        curl -H "Host: ${bucket}.s3.amazonaws.com" \
+        -H "Date: ${dateValue}" \
+        -H "Authorization: AWS ${s3Key}:${signature}" \
+        ${{ env.VERTICA_CE_URL_ARM64 }} -o docker-vertica/packages/vertica-latest.RHEL8.aarch64.rpm
 
         cp docker-vertica/packages/*rpm docker-vertica-v2/packages
