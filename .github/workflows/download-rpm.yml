@@ -44,18 +44,14 @@ jobs:
         resource="/${bucket}/${file}"
         printf -v stringToSign "%s\n%s\n\n%s\n%s" "GET" "" "$date" "${resource}"
         signature=$(echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | openssl base64)
-        curl -H "Host: ${bucket}.s3.amazonaws.com" \
-        -H "Date: ${date}" \
-        -H "Authorization: AWS ${s3Key}:${signature}" \
+        curl -H "Date: ${date}" -H "Authorization: AWS ${s3Key}:${signature}" \
         ${{ env.VERTICA_CE_URL }} -o docker-vertica/packages/vertica-latest.RHEL8.x86_64.rpm
 
         file=XCz9cp7m/vertica-25.1.0-0.RHEL8.aarch64.rpm
         resource="/${bucket}/${file}"
         printf -v stringToSign "%s\n%s\n\n%s\n%s" "GET" "" "$date" "${resource}"
         signature=`/bin/echo -n "$stringToSign" | openssl sha1 -hmac ${s3Secret} -binary | openssl base64`
-        curl -H "Host: ${bucket}.s3.amazonaws.com" \
-        -H "Date: ${dateValue}" \
-        -H "Authorization: AWS ${s3Key}:${signature}" \
+        curl -H "Date: ${dateValue}" -H "Authorization: AWS ${s3Key}:${signature}" \
         ${{ env.VERTICA_CE_URL_ARM64 }} -o docker-vertica/packages/vertica-latest.RHEL8.aarch64.rpm
 
         cp docker-vertica/packages/*rpm docker-vertica-v2/packages
